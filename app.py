@@ -170,15 +170,20 @@ def reservar():
         cursor = conn.cursor()
 
         # Validar solapamientos de reservas
-        cursor.execute('''
-            SELECT COUNT(*) FROM reservas
-            WHERE fecha = %s
-            AND (
-                (hora::time + duracion * interval '1 minute') > %s::time
-                AND hora < (%s::time + %s * interval '1 minute')
-            )
-        ''', (fecha, hora, hora, data.get('duracion', 30)))
-        solapamientos = cursor.fetchone()[0]
+        try:
+            print(f"Fecha: {fecha}, Hora: {hora}, Duración: {data.get('duracion', 30)}")
+            cursor.execute('''
+                SELECT COUNT(*) FROM reservas
+                WHERE fecha = %s
+                AND (
+                    (hora + (duracion * interval '1 minute')) > %s
+                    AND hora < (%s + (%s * interval '1 minute'))
+                )
+            ''', (fecha, hora, hora, int(data.get('duracion', 30))))
+            solapamientos = cursor.fetchone()[0]
+        except Exception as e:
+            print(f"Error en la consulta SQL: {e}")
+            return jsonify({'success': False, 'message': str(e)}), 500
 
         if solapamientos > 0:
             return jsonify({'success': False, 'message': 'Ya existe una reserva en el horario seleccionado.'}), 400
