@@ -160,6 +160,22 @@ def reservar():
 
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Validar solapamientos de reservas
+        cursor.execute('''
+            SELECT COUNT(*) FROM reservas
+            WHERE fecha = ?
+            AND (
+                datetime(hora, '+' || duracion || ' minutes') > datetime(?, 'localtime')
+                AND hora < datetime(?, '+' || ? || ' minutes', 'localtime')
+            )
+        ''', (fecha, hora, hora, data.get('duracion', 30)))
+        solapamientos = cursor.fetchone()[0]
+
+        if solapamientos > 0:
+            return jsonify({'success': False, 'message': 'Ya existe una reserva en el horario seleccionado.'}), 400
+
+        # Insertar nueva reserva
         cursor.execute('''
             INSERT INTO reservas (nombre_cliente, telefono_cliente, fecha, hora, tratamiento, empleado_id, duracion)
             VALUES (?, ?, ?, ?, ?, ?, ?)
