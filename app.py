@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session, flash, redirect, url_for, Response
-import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -21,35 +22,43 @@ twilio_number = "+11234567890"  # Tu número de Twilio
 # --- Funciones de Base de Datos ---
 
 def get_db_connection():
-    conn = sqlite3.connect('reservas.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+    try:
+        conn = psycopg2.connect(
+            os.environ.get('DATABASE_URL'),
+            cursor_factory=RealDictCursor
+        )
+        print("Conexión a PostgreSQL establecida correctamente.")
+        return conn
+    except Exception as e:
+        print(f"Error al conectar con la base de datos PostgreSQL: {e}")
+        raise
 
 def crear_tablas():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre TEXT NOT NULL,
             password TEXT NOT NULL
-        )
+        );
     ''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS reservas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre_cliente TEXT NOT NULL,
             telefono_cliente TEXT NOT NULL,
-            fecha TEXT NOT NULL,
-            hora TEXT NOT NULL,
+            fecha DATE NOT NULL,
+            hora TIME NOT NULL,
             tratamiento TEXT NOT NULL,
             empleado_id INTEGER,
             duracion INTEGER DEFAULT 30,
             FOREIGN KEY (empleado_id) REFERENCES usuarios(id)
-        )
+        );
     ''')
     conn.commit()
-    conn.close()  # ¡IMPORTANTE! Cierra la conexión.
+    conn.close()
+    print("Tablas creadas correctamente en PostgreSQL.")
 
 # Mover la llamada a crear_tablas() fuera del bloque if __name__ == '__main__':
 crear_tablas()
@@ -120,7 +129,7 @@ def login():
             print(f"Datos recibidos: username={username}, password={password}")
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM usuarios WHERE nombre = ?', (username,))
+            cursor.execute('SELECT * FROM usuarios WHERE nombre = %s', (username,))
             user = cursor.fetchone()
             conn.close()
 
@@ -166,10 +175,10 @@ def reservar():
         # Validar solapamientos de reservas
         cursor.execute('''
             SELECT COUNT(*) FROM reservas
-            WHERE fecha = ?
+            WHERE fecha = %s
             AND (
-                datetime(hora, '+' || duracion || ' minutes') > datetime(?, 'localtime')
-                AND hora < datetime(?, '+' || ? || ' minutes', 'localtime')
+                (hora::time + duracion * interval '1 minute') > %s::time
+                AND hora < (%s::time + %s * interval '1 minute')
             )
         ''', (fecha, hora, hora, data.get('duracion', 30)))
         solapamientos = cursor.fetchone()[0]
@@ -180,7 +189,7 @@ def reservar():
         # Insertar nueva reserva
         cursor.execute('''
             INSERT INTO reservas (nombre_cliente, telefono_cliente, fecha, hora, tratamiento, empleado_id, duracion)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (nombre, telefono, fecha, hora, tratamiento, empleado_id, data.get('duracion', 30)))
         conn.commit()
         conn.close()
@@ -216,7 +225,7 @@ def obtener_reservas():
             if reserva['empleado_id'] is None:
                 nombre_empleado = 'Empleado Desconocido'
             else:
-                cursor.execute("SELECT nombre FROM usuarios WHERE id = ?", (reserva['empleado_id'],))
+                cursor.execute("SELECT nombre FROM usuarios WHERE id = %s", (reserva['empleado_id'],))
                 empleado = cursor.fetchone()
                 nombre_empleado = empleado['nombre'] if empleado else 'Empleado Desconocido'
 
@@ -257,7 +266,7 @@ def eliminar_reserva():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM reservas WHERE id = ?', (reserva_id,))
+        cursor.execute('DELETE FROM reservas WHERE id = %s', (reserva_id,))
         conn.commit()
         conn.close()
 
