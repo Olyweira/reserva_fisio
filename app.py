@@ -51,6 +51,8 @@ def crear_tablas():
     conn.commit()
     conn.close()  # ¡IMPORTANTE! Cierra la conexión.
 
+# Mover la llamada a crear_tablas() fuera del bloque if __name__ == '__main__':
+crear_tablas()
 
 # --- Decorador para proteger rutas ---
 
@@ -277,5 +279,4 @@ def retroceder_dia():
     return jsonify({'success': True})
 
 if __name__ == '__main__':
-    crear_tablas()
     app.run(debug=True)
