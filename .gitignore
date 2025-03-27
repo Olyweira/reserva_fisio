@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.db
 __pycache__/
 *.pyc
@@ -13,3 +14,20 @@ reservas.db
 venv_limpio/
 *.pyc
 __pycache__/
+=======
+*.db
+__pycache__/
+*.pyc
+.env
+.DS_Store
+
+# Archivos y carpetas específicas de Git
+.git/
+.gitignore
+
+# Excluir archivos y carpetas innecesarios para el despliegue
+reservas.db
+venv_limpio/
+*.pyc
+__pycache__/
+>>>>>>> 47bf082f8800ac5a939d84ba2b19b9916c3f30ea

@@ -1,9 +1,9 @@
-import psycopg2
+import sqlite3
 from werkzeug.security import generate_password_hash
-import os
 
 def get_db_connection():
-    conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
+    conn = sqlite3.connect('reservas.db')
+    conn.row_factory = sqlite3.Row
     return conn
 
 def crear_usuario(nombre, password):
@@ -12,7 +12,7 @@ def crear_usuario(nombre, password):
     hashed_password = generate_password_hash(password)
     cursor.execute('''
         INSERT INTO usuarios (nombre, password)
-        VALUES (%s, %s)
+        VALUES (?, ?)
     ''', (nombre, hashed_password))
     conn.commit()
     conn.close()

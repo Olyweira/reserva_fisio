@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Estilos generales */
 body {
     font-family: sans-serif; /* Fuente clara */
@@ -260,4 +261,268 @@ footer {
     padding: 1rem;
     background-color: #333;
     color: #fff;
+=======
+/* Estilos generales */
+body {
+    font-family: sans-serif; /* Fuente clara */
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* Gris claro de fondo */
+    color: #333; /* Texto oscuro */
+}
+
+header {
+    background-color: #fff; /* Blanco */
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    display: flex;
+    justify-content: space-between; /* Separa el título y la navegación */
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 1rem;
+}
+nav a{
+    text-decoration: none;
+}
+
+main {
+    padding: 2rem;
+}
+
+h1, h2 {
+    color: #007bff; /* Azul principal (o tu color elegido) */
+}
+
+/* Estilos del formulario */
+#formulario-reserva {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+form label {
+    display: block; /* Cada etiqueta en una línea */
+    margin-bottom: 0.5rem;
+}
+
+form input[type="text"],
+form input[type="tel"],
+form input[type="date"],
+form input[type="time"],
+form select {
+    width: 100%; /* Ancho completo */
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Incluye padding y borde en el ancho */
+}
+
+form button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+form button[type="submit"]:hover {
+    background-color: #0056b3; /* Un azul más oscuro al pasar el ratón */
+}
+
+/* Estilos del Calendario */
+#calendario {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    max-width: 100%; /* Asegurar que el calendario no desborde */
+    overflow-x: auto; /* Permitir desplazamiento horizontal si es necesario */
+}
+
+/* Ajustar el tamaño de los eventos */
+.fc-event {
+    white-space: normal; /* Permitir que el texto se ajuste en varias líneas */
+    height: auto !important; /* Ajustar automáticamente la altura */
+    padding: 8px; /* Aumentar el espaciado interno */
+    font-size: 1rem; /* Aumentar el tamaño de la fuente */
+    line-height: 1.4; /* Espaciado entre líneas */
+    background-color: white !important; /* Fondo blanco */
+    border: 1px solid #ccc; /* Borde gris claro */
+    overflow: hidden; /* Evitar que el texto se salga del recuadro */
+    text-overflow: ellipsis; /* Mostrar puntos suspensivos si el texto es muy largo */
+}
+
+/* Ajustar las celdas del calendario */
+.fc-daygrid-day {
+    min-height: 120px; /* Aumentar la altura mínima de las celdas */
+}
+
+.fc-daygrid-event {
+    margin: 2px 0; /* Espaciado entre eventos */
+    border-radius: 4px; /* Bordes redondeados para mejor apariencia */
+}
+
+/* Ajustar los eventos en la vista de día y semana */
+.fc-timegrid-event {
+    font-size: 1rem; /* Aumentar el tamaño de la fuente */
+    padding: 5px; /* Espaciado interno */
+    white-space: normal; /* Permitir que el texto se ajuste */
+    overflow: hidden; /* Evitar que el texto se salga */
+    text-overflow: ellipsis; /* Mostrar puntos suspensivos si el texto es muy largo */
+}
+
+/* Mejorar la visualización en dispositivos móviles */
+@media (max-width: 768px) {
+    /* Ajustar el tamaño de los eventos */
+    .fc .fc-daygrid-event {
+        font-size: 0.9rem; /* Reducir ligeramente el tamaño de fuente */
+        padding: 4px; /* Reducir el padding */
+    }
+
+    /* Ajustar la barra de herramientas */
+    .fc-toolbar {
+        flex-wrap: wrap; /* Permitir que los controles se ajusten en varias líneas */
+        justify-content: center; /* Centrar los controles */
+    }
+
+    .fc-toolbar-title {
+        font-size: 1rem; /* Reducir el tamaño del título */
+        margin-bottom: 0.5rem; /* Espaciado inferior */
+    }
+
+    /* Ajustar las celdas del calendario */
+    .fc-daygrid-day {
+        min-height: 100px; /* Reducir la altura mínima de las celdas */
+    }
+
+    /* Ajustar el diseño de los botones */
+    .fc-button {
+        font-size: 0.8rem; /* Reducir el tamaño de fuente de los botones */
+        padding: 0.5rem 0.75rem; /* Reducir el padding de los botones */
+    }
+
+    /* Ocultar los bordes de los eventos para mayor claridad */
+    .fc-event {
+        border: none !important;
+    }
+
+    header {
+        flex-direction: column; /* Cambiar la dirección del contenido */
+        align-items: flex-start; /* Alinear a la izquierda */
+    }
+
+    nav ul {
+        flex-direction: column; /* Mostrar los enlaces en una columna */
+        width: 100%; /* Ancho completo */
+    }
+
+    nav ul li {
+        margin: 0.5rem 0; /* Espaciado entre los enlaces */
+    }
+
+    #formulario-reserva, #calendario {
+        padding: 1rem; /* Reducir el padding */
+        margin: 1rem 0; /* Reducir el margen */
+    }
+
+    form input, form select, form button {
+        font-size: 0.9rem; /* Reducir el tamaño de fuente */
+    }
+
+    #calendar {
+        font-size: 0.8rem; /* Reducir el tamaño de fuente */
+    }
+
+    .fc-daygrid-day {
+        min-height: 80px; /* Reducir la altura mínima de las celdas */
+    }
+
+    .fc-list-event {
+        padding: 0.5rem; /* Reducir el padding de los eventos en la vista de lista */
+    }
+}
+
+/* Colores para los empleados (solo texto) */
+.empleado-1 {
+    color: green !important; /* Texto verde para el empleado 1 */
+}
+
+.empleado-2 {
+    color: goldenrod !important; /* Texto amarillo para el empleado 2 */
+}
+
+.empleado-3 {
+    color: blue !important; /* Texto azul para el empleado 3 */
+}
+
+/* Estilo para eventos de Indiba */
+.evento-indiba {
+    background-color: #ffcccc; /* Color de fondo para Indiba */
+    border-color: #ff6666; /* Color del borde para Indiba */
+    color: #660000; /* Color del texto para Indiba */
+}
+
+/* Estilo para eventos de Fisioterapia */
+.evento-fisioterapia {
+    background-color: #ccffcc; /* Color de fondo para Fisioterapia */
+    border-color: #66cc66; /* Color del borde para Fisioterapia */
+    color: #003300; /* Color del texto para Fisioterapia */
+}
+
+/* Estilo por defecto para otros eventos */
+.evento-default {
+    background-color: #ccccff; /* Color de fondo por defecto */
+    border-color: #6666ff; /* Color del borde por defecto */
+    color: #000066; /* Color del texto por defecto */
+}
+
+/* Estilo para el botón de eliminación dentro de los eventos */
+.delete-event-btn {
+    background-color: transparent;
+    border: none;
+    color: red;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.delete-event-btn:hover {
+    color: darkred;
+    text-decoration: underline;
+}
+
+/* Estilo para el botón personalizado "Agenda" */
+.fc-agendaButton-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.fc-agendaButton-button:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #333;
+    color: #fff;
+>>>>>>> 47bf082f8800ac5a939d84ba2b19b9916c3f30ea
 }

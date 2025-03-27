@@ -13,14 +13,12 @@ app.secret_key = 'TU_CLAVE_SECRETA_AQUI'  # ¡CAMBIA ESTO!
 # Configuración para no escapar caracteres Unicode en respuestas JSON
 app.config['JSON_AS_ASCII'] = False
 
-# --- Credenciales de Twilio (Cuenta de Prueba) ---
-# ¡REEMPLAZA ESTO CON TUS CREDENCIALES REALES DE TWILIO!
+# Credenciales de Twilio (Cuenta de Prueba)
 account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Tu Account SID
 auth_token = "tu_auth_token"  # Tu Auth Token
 twilio_number = "+11234567890"  # Tu número de Twilio
 
-# --- Funciones de Base de Datos ---
-
+# Funciones de Base de Datos
 def get_db_connection():
     try:
         conn = psycopg2.connect(
@@ -60,7 +58,6 @@ def crear_tablas():
     conn.close()
     print("Tablas creadas correctamente en PostgreSQL.")
 
-# Mover la llamada a crear_tablas() fuera del bloque if __name__ == '__main__':
 crear_tablas()
 
 # --- Decorador para proteger rutas ---
