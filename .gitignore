@@ -1,0 +1,9 @@
+*.db
+__pycache__/
+*.pyc
+.env
+.DS_Store
+
+# Archivos y carpetas específicas de Git
+.git/
+.gitignore
