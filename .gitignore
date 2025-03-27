@@ -7,3 +7,9 @@ __pycache__/
 # Archivos y carpetas específicas de Git
 .git/
 .gitignore
+
+# Excluir archivos y carpetas innecesarios para el despliegue
+reservas.db
+venv_limpio/
+*.pyc
+__pycache__/
