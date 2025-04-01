@@ -293,4 +293,4 @@ def eliminar_reserva(reserva_id):
 if __name__ == '__main__':
     crear_tablas()
     insertar_usuarios_predeterminados()  # Crear usuarios predeterminados
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
