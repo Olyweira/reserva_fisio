@@ -138,12 +138,19 @@ def login():
             username = request.form['username']
             password = request.form['password']
             print(f"Datos recibidos: username={username}, password={password}")
+
+            # Intentar conectar a la base de datos
             conn = get_db_connection()
             cursor = conn.cursor()
+
+            # Ejecutar la consulta para buscar al usuario
             cursor.execute('SELECT * FROM usuarios WHERE nombre = %s', (username,))
             user = cursor.fetchone()
+            print(f"Resultado de la consulta para el usuario '{username}': {user}")
+
             conn.close()
 
+            # Verificar si el usuario existe y la contraseña es correcta
             if user and check_password_hash(user['password'], password):
                 session['logged_in'] = True
                 session['username'] = user['nombre']
@@ -151,6 +158,7 @@ def login():
                 flash('¡Inicio de sesión exitoso!', 'success')
                 return redirect(url_for('index'))  # Redirige a la página principal
             else:
+                print("Usuario o contraseña incorrectos.")
                 return jsonify({'success': False, 'message': 'Usuario o contraseña incorrectos.'}), 401
         except Exception as e:
             print(f"Error en el inicio de sesión: {e}")
