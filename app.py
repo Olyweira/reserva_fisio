@@ -21,9 +21,15 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 # --- Funciones de Base de Datos ---
 
 def get_db_connection():
-    database_url = os.environ.get('INTERNAL_DATABASE_URL', os.environ.get('DATABASE_URL'))
-    conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
-    return conn
+    try:
+        database_url = os.environ.get('DATABASE_URL')  # Usar DATABASE_URL directamente
+        print(f"Intentando conectar a la base de datos: {database_url}")
+        conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+        print("Conexión exitosa a la base de datos.")
+        return conn
+    except Exception as e:
+        print(f"Error al conectar a la base de datos: {e}")
+        raise
 
 def crear_tablas():
     conn = get_db_connection()
