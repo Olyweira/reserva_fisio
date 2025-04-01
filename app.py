@@ -21,8 +21,8 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 # --- Funciones de Base de Datos ---
 
 def get_db_connection():
-    # Usar la URL interna proporcionada por Render
-    database_url = os.environ.get('DATABASE_URL', 'postgresql://reservas_l32i_user:Q4bkvs3nqs70bdG6W3QOfrCv1C2DaxuQ@dpg-cvm64oogjchc73f15uc0-a/reservas_l32i')
+    # Priorizar INTERNAL_DATABASE_URL si está configurada
+    database_url = os.environ.get('INTERNAL_DATABASE_URL', os.environ.get('DATABASE_URL'))
     conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)  # Conexión a PostgreSQL
     return conn
 
