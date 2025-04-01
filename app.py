@@ -50,6 +50,18 @@ def crear_tablas():
     conn.commit()
     conn.close()  # ¡IMPORTANTE! Cierra la conexión.
 
+def insertar_usuarios_predeterminados():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT COUNT(*) FROM usuarios')
+    if cursor.fetchone()[0] == 0:  # Si no hay usuarios
+        usuarios = [
+            ('empleado1', generate_password_hash('empleado1')),
+            ('empleado2', generate_password_hash('empleado2'))
+        ]
+        cursor.executemany('INSERT INTO usuarios (nombre, password) VALUES (?, ?)', usuarios)
+        conn.commit()
+    conn.close()
 
 # --- Decorador para proteger rutas ---
 
@@ -268,4 +280,5 @@ def eliminar_reserva(reserva_id):
 
 if __name__ == '__main__':
     crear_tablas()
+    insertar_usuarios_predeterminados()  # Crear usuarios predeterminados
     app.run(debug=True)
