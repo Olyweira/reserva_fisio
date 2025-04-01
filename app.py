@@ -31,8 +31,11 @@ def get_db_connection():
         conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
         print("Conexión exitosa a la base de datos.")
         return conn
+    except psycopg2.OperationalError as e:
+        print(f"Error de conexión a la base de datos: {e}")
+        raise
     except Exception as e:
-        print(f"Error al conectar a la base de datos: {e}")
+        print(f"Error inesperado al conectar a la base de datos: {e}")
         raise
 
 def crear_tablas():
