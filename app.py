@@ -21,9 +21,8 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 # --- Funciones de Base de Datos ---
 
 def get_db_connection():
-    # Priorizar INTERNAL_DATABASE_URL si está configurada
     database_url = os.environ.get('INTERNAL_DATABASE_URL', os.environ.get('DATABASE_URL'))
-    conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)  # Conexión a PostgreSQL
+    conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
     return conn
 
 def crear_tablas():
