@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session, flash, redirect, url_for, Response
-import sqlite3
+import psycopg2  # Importar psycopg2 para PostgreSQL
+from psycopg2.extras import RealDictCursor  # Para obtener resultados como diccionarios
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -20,8 +21,9 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 # --- Funciones de Base de Datos ---
 
 def get_db_connection():
-    conn = sqlite3.connect('reservas.db')
-    conn.row_factory = sqlite3.Row
+    # Usar la URL de conexión proporcionada por Render
+    database_url = os.environ.get('DATABASE_URL', 'postgresql://reservas_l32i_user:Q4bkvs3nqs70bdG6W3QOfrCv1C2DaxuQ@dpg-cvm64oogjchc73f15uc0-a.frankfurt-postgres.render.com/reservas_l32i')
+    conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)  # Conexión a PostgreSQL
     return conn
 
 def crear_tablas():
@@ -29,18 +31,18 @@ def crear_tablas():
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre TEXT NOT NULL,
             password TEXT NOT NULL
         )
     ''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS reservas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre_cliente TEXT NOT NULL,
             telefono_cliente TEXT NOT NULL,
-            fecha TEXT NOT NULL,
-            hora TEXT NOT NULL,
+            fecha DATE NOT NULL,
+            hora TIME NOT NULL,
             tratamiento TEXT NOT NULL,
             empleado_id INTEGER,
             duracion INTEGER DEFAULT 30,
@@ -54,12 +56,12 @@ def insertar_usuarios_predeterminados():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT COUNT(*) FROM usuarios')
-    if cursor.fetchone()[0] == 0:  # Si no hay usuarios
+    if cursor.fetchone()['count'] == 0:  # Si no hay usuarios
         usuarios = [
             ('empleado1', generate_password_hash('empleado1')),
             ('empleado2', generate_password_hash('empleado2'))
         ]
-        cursor.executemany('INSERT INTO usuarios (nombre, password) VALUES (?, ?)', usuarios)
+        cursor.executemany('INSERT INTO usuarios (nombre, password) VALUES (%s, %s)', usuarios)
         conn.commit()
     conn.close()
 
@@ -129,7 +131,7 @@ def login():
             print(f"Datos recibidos: username={username}, password={password}")
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM usuarios WHERE nombre = ?', (username,))
+            cursor.execute('SELECT * FROM usuarios WHERE nombre = %s', (username,))
             user = cursor.fetchone()
             conn.close()
 
@@ -180,11 +182,11 @@ def reservar():
             cursor.execute('''
                 SELECT * FROM reservas
                 WHERE tratamiento = 'indiba'
-                AND fecha = ?
+                AND fecha = %s
                 AND (
-                    (hora >= ? AND hora < ?)
-                    OR (datetime(fecha || ' ' || hora, '+' || ? || ' minutes') > datetime(? || ' ' || ?)
-                        AND datetime(fecha || ' ' || hora) < datetime(? || ' ' || ?, '+' || ? || ' minutes')
+                    (hora >= %s AND hora < %s)
+                    OR (fecha + hora + interval %s minute > %s + %s
+                        AND fecha + hora < %s + %s + interval %s minute
                     )
                 )
             ''', (fecha, hora, fecha_hora_fin_reserva.time().isoformat(), duracion, fecha, hora, fecha, hora, duracion))
@@ -196,7 +198,7 @@ def reservar():
 
         cursor.execute('''
             INSERT INTO reservas (nombre_cliente, telefono_cliente, fecha, hora, tratamiento, empleado_id, duracion)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (nombre, telefono, fecha, hora, tratamiento, empleado_id, duracion))  # Inserta la duración y el empleado_id
         conn.commit()
         print(f"Reserva insertada: {nombre, telefono, fecha, hora, tratamiento, empleado_id, duracion}")
@@ -219,7 +221,8 @@ def reservar():
 def obtener_empleados():
     conn = get_db_connection()
     cursor = conn.cursor()
-    empleados = cursor.execute('SELECT id, nombre FROM usuarios').fetchall()
+    cursor.execute('SELECT id, nombre FROM usuarios')
+    empleados = cursor.fetchall()
     conn.close()
     return jsonify([{'id': row['id'], 'nombre': row['nombre']} for row in empleados])
 
@@ -237,7 +240,7 @@ def obtener_reservas():
     for reserva in reservas:
         # Obtener el nombre del empleado (usando un nuevo cursor)
         nombre_cursor = conn.cursor()  # Crea un NUEVO cursor
-        nombre_cursor.execute("SELECT nombre FROM usuarios WHERE id = ?", (reserva['empleado_id'],))
+        nombre_cursor.execute("SELECT nombre FROM usuarios WHERE id = %s", (reserva['empleado_id'],))
         empleado = nombre_cursor.fetchone()
         nombre_empleado = empleado['nombre'] if empleado else 'Desconocido'
         nombre_cursor.close()  # Cierra el cursor *inmediatamente*
@@ -270,7 +273,7 @@ def eliminar_reserva(reserva_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM reservas WHERE id = ?', (reserva_id,))
+        cursor.execute('DELETE FROM reservas WHERE id = %s', (reserva_id,))
         conn.commit()
         conn.close()
         return jsonify({'success': True}), 200
