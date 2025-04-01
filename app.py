@@ -22,10 +22,10 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
 def get_db_connection():
     try:
-        # Proporcionar un valor predeterminado si DATABASE_URL no está configurado
+        # Usar DATABASE_URL desde el entorno o un valor predeterminado
         database_url = os.environ.get(
             'DATABASE_URL',
-            'postgresql://reservas_l32i_user:Q4bkvs3nqs70bdG6W3QOfrCv1C2DaxuQ@dpg-cvm64oogjchc73f15uc0-a.frankfurt-postgres.render.com/reservas_l32i'
+            'postgresql://reservas_l32i_user:Q4bkvs3nqs70bdG6W3QOfrCv1C2DaxuQ@dpg-cvm64oogjchc73f15uc0-a:5432/reservas'
         )
         print(f"Intentando conectar a la base de datos: {database_url}")
         conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
